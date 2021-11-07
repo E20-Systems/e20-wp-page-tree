@@ -1,0 +1,16 @@
+{
+  "name": "E20-Systems/wp-page-tree",
+  "description": "Page tree plugin for WordPress",
+  "keywords": ["wordpress", "plugin", "page", "tree", "page tree"],
+  "homepage": "https://github.com/e20-systems",
+  "authors": [
+    {
+      "name": "Gaelan Lloyd",
+      "homepage": "https://www.gaelanlloyd.com"
+    }
+  ],
+  "type": "wordpress-plugin",
+  "require": {
+    "php": ">=5.6"
+  }
+}
