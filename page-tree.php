@@ -158,6 +158,7 @@ function show() {
 				<th class="cell-table-layout">Date</th>
 				<th class="cell-table-layout">Slug</th>
 				<th class="cell-table-layout">Title</th>
+				<th class="cell-table-layout">URL</th>
 			</tr>
 
 			<?php echo page_tree_output_table(); ?>
@@ -396,6 +397,7 @@ class Page_Walker_Table extends Walker_page {
 				<a href="<?php echo get_page_link( $page->ID ); ?>"><?php echo $page->post_title; ?></a>
 
 			</td>
+			<td style="<?php echo $style; ?>"><?php echo get_permalink( $page->ID ); ?></td>
 		</tr>
 
 		<?php $out .= ob_get_clean();
