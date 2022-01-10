@@ -3,7 +3,7 @@
 Plugin Name: Page Tree
 Plugin URI: https://www.gaelanlloyd.com
 Description: Shows a page tree view for easy site browsing.
-Version: 1.1.2
+Version: 1.1.3
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
