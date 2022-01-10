@@ -3,7 +3,7 @@
 Plugin Name: Page Tree
 Plugin URI: https://www.gaelanlloyd.com
 Description: Shows a page tree view for easy site browsing.
-Version: 1.1.3
+Version: 1.1.4
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
@@ -31,6 +31,8 @@ function show() {
 	$css_data = 'font-family: monospace; width: 100%; overflow: hidden; display: block; word-wrap: break-word; margin: 0; padding: 0;';
 
 	$separator = "<hr style=\"margin: 1em 0;\">";
+
+	$txtCopyButton = "Copy to clipboard";
 
 ?>
 
@@ -82,17 +84,39 @@ function show() {
 	}
 
 	function showTable() {
-		jQuery("#pageTreeTable").show();
+		jQuery("#pageTreeTable").toggle();
 	}
 
 	function showLPR() {
-		jQuery("#linePrinter").show();
+		jQuery("#linePrinter").toggle();
 	}
 
 	function showIDURL() {
-		jQuery("#idurl").show();
+		jQuery("#idurl").toggle();
 	}
 
+    function selectElementContents(el) {
+        var body = document.body, range, sel;
+        if (document.createRange && window.getSelection) {
+            range = document.createRange();
+            sel = window.getSelection();
+            sel.removeAllRanges();
+            try {
+                range.selectNodeContents(el);
+                sel.addRange(range);
+            } catch (e) {
+                range.selectNode(el);
+                sel.addRange(range);
+            }
+            document.execCommand('copy');
+
+        } else if (body.createTextRange) {
+            range = body.createTextRange();
+            range.moveToElementText(el);
+            range.select();
+            range.execCommand('copy');
+        }
+    }
 </script>
 
 	<div class="wrap">
@@ -149,19 +173,22 @@ function show() {
 
 		<div id="pageTreeTable" style="display: none;">
 
-			<p>Copy this entire table into Microsoft Excel then manipulate away!</p>
+			<p>Use Microsoft Excel to manipulate this table like a pro.</p>
 
-			<table border="1" style="border-collapse: collapse;">
+			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptTable') );">
 
-			<tr>
-				<th class="cell-table-layout">ID</th>
-				<th class="cell-table-layout">Date</th>
-				<th class="cell-table-layout">Slug</th>
-				<th class="cell-table-layout">Title</th>
-				<th class="cell-table-layout">URL</th>
-			</tr>
+			<table id="ptTable" border="1" style="border-collapse: collapse; margin-top: 1em;">
 
-			<?php echo page_tree_output_table(); ?>
+				<tr>
+					<th class="cell-table-layout">ID</th>
+					<th class="cell-table-layout">Date</th>
+					<th class="cell-table-layout">Slug</th>
+					<th class="cell-table-layout">Title</th>
+					<th class="cell-table-layout">URL</th>
+				</tr>
+
+				<?php echo page_tree_output_table(); ?>
+
 			</table>
 
 		</div>
@@ -172,7 +199,9 @@ function show() {
 
 		<div id="idurl" style="display: none;">
 
-			<pre class="code"><?php echo page_tree_output_idurl(); ?></pre>
+			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptIDURL') );">
+
+			<pre id="ptIDURL" class="code"><?php echo page_tree_output_idurl(); ?></pre>
 
 		</div>
 
@@ -184,7 +213,9 @@ function show() {
 
 			<p>Print using a monospaced font for best results.</p>
 
-			<pre class="code"><?php echo page_tree_output_lpr(); ?></pre>
+			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptLPR') );">
+
+			<pre id="ptLPR" class="code"><?php echo page_tree_output_lpr(); ?></pre>
 
 		</div>
 
