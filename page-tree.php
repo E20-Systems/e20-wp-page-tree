@@ -1,9 +1,8 @@
 <?php
 /*
-Plugin Name: Page Tree
-Plugin URI: https://www.gaelanlloyd.com
-Description: Shows a page tree view for easy site browsing.
-Version: 1.1.4
+Plugin Name: E20 Page Tree
+Description: Advanced page tree view for easy site browsing and data exports.
+Version: 1.1.5
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
@@ -83,18 +82,6 @@ function show() {
 	    jQuery(".item-has-children").find(".dashicons").addClass("dashicons-arrow-right");
 	}
 
-	function showTable() {
-		jQuery("#pageTreeTable").toggle();
-	}
-
-	function showLPR() {
-		jQuery("#linePrinter").toggle();
-	}
-
-	function showIDURL() {
-		jQuery("#idurl").toggle();
-	}
-
     function selectElementContents(el) {
         var body = document.body, range, sel;
         if (document.createRange && window.getSelection) {
@@ -117,6 +104,12 @@ function show() {
             range.execCommand('copy');
         }
     }
+
+    function showTab(tab) {
+        jQuery(".pagetree-output").hide();
+        jQuery("#"+tab).show();
+    }
+
 </script>
 
 	<div class="wrap">
@@ -125,53 +118,58 @@ function show() {
 
 			<h1 class="wp-heading-inline">Page tree</h1>
 
-			<div class="page-tree">
-				<ul>
-
-					<?php // Table key ?>
-
-					<li class="page-item-header">
-
-						<div class="page-item">
-							<div class="page-meta"><a href="javascript:void(0)" onclick="expandAll()">Expand all</a></div>
-							<div class="page-meta"><a href="javascript:void(0)" onclick="collapseAll()">Collapse all</a></div>
-							<div class="page-title page-meta page-meta-header">Page title</div>
-						</div>
-
-						<?php // Items in backwards order because of float right ?>
-
-						<div class="page-meta" style="width: 90px;">
-							<pre style="<?php echo $css_data; ?>">Modified</pre>
-						</div>
-
-						<div class="page-meta" style="width: 200px;">
-							<pre style="<?php echo $css_data; ?>">Slug</pre>
-						</div>
-
-						<div class="page-meta" style="width: 60px;">
-							<pre style="<?php echo $css_data; ?>">ID</pre>
-						</div>
-
-						<div class="page-links-description page-meta page-meta-spacer">
-							Edit/View links will open in a new tab
-						</div>
-
-					</li>
-
-					<?php echo page_tree_output(); ?>
-
-				</ul>
-			</div><!-- /.page-tree -->
+			<h2 class="nav-tab-wrapper">
+				<a class="nav-tab nav-tab-active" href="javascript:showTab('pageTree')">Table</a>
+				<a class="nav-tab" href="javascript:showTab('simpleTable')">Simple table</a>
+				<a class="nav-tab" href="javascript:showTab('tsv')">TSV</a>
+				<a class="nav-tab" href="javascript:showTab('linePrinter')">ASCII</a>
+			</h2>
 
 		</form>
 
-		<h2 style="margin-top: 5em; font-size: 1.5rem;">Other formats</h2>
 
-		<?php echo $separator; ?>
 
-		<h3><a href="javascript:void(0);" onclick="showTable()">Table</a></h3>
+		<div id="pageTree" class="pagetree-output page-tree">
+			<ul>
 
-		<div id="pageTreeTable" style="display: none;">
+				<?php // Table key ?>
+
+				<li class="page-item-header">
+
+					<div class="page-item">
+						<div class="page-meta"><a href="javascript:void(0)" onclick="expandAll()">Expand all</a></div>
+						<div class="page-meta"><a href="javascript:void(0)" onclick="collapseAll()">Collapse all</a></div>
+						<div class="page-title page-meta page-meta-header">Page title</div>
+					</div>
+
+					<?php // Items in backwards order because of float right ?>
+
+					<div class="page-meta" style="width: 90px;">
+						<pre style="<?php echo $css_data; ?>">Modified</pre>
+					</div>
+
+					<div class="page-meta" style="width: 200px;">
+						<pre style="<?php echo $css_data; ?>">Slug</pre>
+					</div>
+
+					<div class="page-meta" style="width: 60px;">
+						<pre style="<?php echo $css_data; ?>">ID</pre>
+					</div>
+
+					<div class="page-links-description page-meta page-meta-spacer">
+						Edit/View links will open in a new tab
+					</div>
+
+				</li>
+
+				<?php echo page_tree_output(); ?>
+
+			</ul>
+		</div><!-- /.page-tree -->
+
+
+
+		<div id="simpleTable" class="pagetree-output" style="display: none;">
 
 			<p>Use Microsoft Excel to manipulate this table like a pro.</p>
 
@@ -181,7 +179,7 @@ function show() {
 
 				<tr>
 					<th class="cell-table-layout">ID</th>
-					<th class="cell-table-layout">Date</th>
+					<th class="cell-table-layout">Modified</th>
 					<th class="cell-table-layout">Slug</th>
 					<th class="cell-table-layout">Title</th>
 					<th class="cell-table-layout">URL</th>
@@ -193,11 +191,11 @@ function show() {
 
 		</div>
 
-		<?php echo $separator; ?>
 
-		<h3><a href="javascript:void(0);" onclick="showIDURL()">ID / URL map</a></h3>
 
-		<div id="idurl" style="display: none;">
+		<div id="tsv" class="pagetree-output" style="display: none;">
+
+			<p>This tab separated data can be imported into Excel or other programs.</p>
 
 			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptIDURL') );">
 
@@ -205,19 +203,20 @@ function show() {
 
 		</div>
 
-		<?php echo $separator; ?>
 
-		<h3><a href="javascript:void(0);" onclick="showLPR()">ASCII page tree</a></h3>
 
-		<div id="linePrinter" style="display: none;">
 
-			<p>Print using a monospaced font for best results.</p>
+		<div id="linePrinter" class="pagetree-output" style="display: none;">
+
+			<p>Use a monospaced font for best results.</p>
 
 			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptLPR') );">
 
 			<pre id="ptLPR" class="code"><?php echo page_tree_output_lpr(); ?></pre>
 
 		</div>
+
+
 
 	</div><!-- /.wrap -->
 
@@ -273,7 +272,7 @@ function page_tree_output_idurl() {
 	$args = array(
 		'title_li' => '',
 		'show_date' => 'modified',
-		'walker' => new Page_Walker_IDURL()
+		'walker' => new Page_Walker_TSV()
 	);
 
 	echo wp_list_pages( $args );
@@ -484,7 +483,7 @@ class Page_Walker_LPR extends Walker_page {
 
 // -----------------------------------------------------------------------------
 
-class Page_Walker_IDURL extends Walker_page {
+class Page_Walker_TSV extends Walker_page {
 
 	public $db_fields = array(
 		'parent' => 'post_parent',
@@ -504,9 +503,9 @@ class Page_Walker_IDURL extends Walker_page {
 		ob_start();
 
 		echo $page->ID;
-		echo ",";
+		echo "\t";
 		echo get_the_title( $page->ID );
-		echo ",";
+		echo "\t";
 		echo get_page_link( $page->ID );
 		echo "\n";
 
