@@ -2,7 +2,7 @@
 /*
 Plugin Name: E20 Page Tree
 Description: Advanced page tree view for easy site browsing and data exports.
-Version: 1.1.5
+Version: 1.1.6
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
@@ -20,6 +20,20 @@ function add_menu() {
 }
 
 add_action( 'admin_menu', 'e20_page_tree\add_menu' );
+
+// -----------------------------------------------------------------------------
+
+function return_page_template( $id ) {
+
+	$template = get_page_template_slug( $id );
+
+	if ( empty( $template ) ) {
+		return "-";
+	} else {
+		return str_replace( 'template/', '', $template );
+	}
+
+}
 
 // -----------------------------------------------------------------------------
 
@@ -149,6 +163,10 @@ function show() {
 					</div>
 
 					<div class="page-meta" style="width: 200px;">
+						<pre style="<?php echo $css_data; ?>">Template</pre>
+					</div>
+
+					<div class="page-meta" style="width: 200px;">
 						<pre style="<?php echo $css_data; ?>">Slug</pre>
 					</div>
 
@@ -157,7 +175,7 @@ function show() {
 					</div>
 
 					<div class="page-links-description page-meta page-meta-spacer">
-						Edit/View links will open in a new tab
+						&nbsp;
 					</div>
 
 				</li>
@@ -181,6 +199,7 @@ function show() {
 					<th class="cell-table-layout">ID</th>
 					<th class="cell-table-layout">Modified</th>
 					<th class="cell-table-layout">Slug</th>
+					<th class="cell-table-layout">Template</th>
 					<th class="cell-table-layout">Title</th>
 					<th class="cell-table-layout">URL</th>
 				</tr>
@@ -352,6 +371,10 @@ class Page_Walker extends \Walker_page {
 		</div>
 
 		<div class="page-meta" style="width: 200px;">
+			<pre style="<?php echo $css_data; ?>"><?php echo return_page_template( $page->ID ); ?></pre>
+		</div>
+
+		<div class="page-meta" style="width: 200px;">
 			<pre style="<?php echo $css_data; ?>"><?php echo $page->post_name; ?></pre>
 		</div>
 
@@ -417,6 +440,7 @@ class Page_Walker_Table extends Walker_page {
 			<td style="<?php echo $style; ?>"><?php echo $page->ID; ?></td>
 			<td style="<?php echo $style; ?>"><?php echo $dateModified; ?></td>
 			<td style="<?php echo $style; ?>"><?php echo $page->post_name; ?></td>
+			<td style="<?php echo $style; ?>"><?php echo return_page_template( $page->ID ); ?></td>
 
 			<td style="<?php echo $style; ?>">
 
