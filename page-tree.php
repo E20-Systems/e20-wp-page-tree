@@ -2,7 +2,7 @@
 /*
 Plugin Name: E20 Page Tree
 Description: Advanced page tree view for easy site browsing and data exports.
-Version: 1.1.5
+Version: 1.1.7
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
@@ -20,6 +20,22 @@ function add_menu() {
 }
 
 add_action( 'admin_menu', 'e20_page_tree\add_menu' );
+
+// -----------------------------------------------------------------------------
+
+function return_page_template( $id ) {
+
+	$template = get_page_template_slug( $id );
+
+	if ( empty( $template ) ) {
+		return "-";
+	} else {
+		$t = str_replace( 'template/', '', $template );
+		$t = str_replace( '.php', '', $t );
+		return $t;
+	}
+
+}
 
 // -----------------------------------------------------------------------------
 
@@ -43,8 +59,8 @@ function show() {
 	.page-item-header { background-color: rgba(34,113,177,0.3); line-height: 2em; border-top: none !important; }
 	.page-meta-header,
 	.page-meta-input-header { font-weight: bold; }
-	.page-meta { float: right; margin-right: 1em; display: inline; }
-	.page-meta-spacer { margin-right: 2em; }
+	.page-meta { float: right; margin-right: 0.5em; display: inline; }
+	.page-meta-spacer { margin-right: 1em; }
 	.page-meta-input,
 	.page-meta-input[readonly] { font-family: monospace; padding: 2px; margin: 0; border: 1px solid #E0E0E0; border-style: solid; }
 	.page-meta-header.page-title { padding-left: 1em; }
@@ -105,9 +121,26 @@ function show() {
         }
     }
 
-    function showTab(tab) {
+	jQuery( document ).ready(function(){
+		jQuery(".nav-tab").click(function(){
+			$t = jQuery(this).attr('id');
+		});
+	});
+
+    function showTab(t) {
+
+		console.log( t );
+		jQuery('.nav-tab').removeClass('nav-tab-active');
+		jQuery('.nav-tab.' + t).addClass('nav-tab-active');
+		jQuery('.pagetree-output').hide();
+		jQuery('#' + t).show();
+
+		/*
         jQuery(".pagetree-output").hide();
         jQuery("#"+tab).show();
+		jQuery(".nav-tab").removeClass("nav-tab-active");
+		jQuery("#"+tab).addClass("nav-tab-active");
+		*/
     }
 
 </script>
@@ -119,15 +152,15 @@ function show() {
 			<h1 class="wp-heading-inline">Page tree</h1>
 
 			<h2 class="nav-tab-wrapper">
-				<a class="nav-tab nav-tab-active" href="javascript:showTab('pageTree')">Table</a>
-				<a class="nav-tab" href="javascript:showTab('simpleTable')">Simple table</a>
-				<a class="nav-tab" href="javascript:showTab('tsv')">TSV</a>
-				<a class="nav-tab" href="javascript:showTab('linePrinter')">ASCII</a>
+				<a class="nav-tab pageTree nav-tab-active" href="javascript:showTab('pageTree')">Table</a>
+				<a class="nav-tab simpleTable" href="javascript:showTab('simpleTable')">Simple table</a>
+				<a class="nav-tab tsv" href="javascript:showTab('tsv')">TSV</a>
+				<a class="nav-tab linePrinter" href="javascript:showTab('linePrinter')">ASCII</a>
 			</h2>
 
 		</form>
 
-
+		<!-- // --- PAGE TREE OUTPUT --------------------------------------- -->
 
 		<div id="pageTree" class="pagetree-output page-tree">
 			<ul>
@@ -144,8 +177,16 @@ function show() {
 
 					<?php // Items in backwards order because of float right ?>
 
+					<div class="page-meta" style="width: 30px;">
+						<pre style="<?php echo $css_data; ?>">S</pre>
+					</div>
+
 					<div class="page-meta" style="width: 90px;">
 						<pre style="<?php echo $css_data; ?>">Modified</pre>
+					</div>
+
+					<div class="page-meta" style="width: 200px;">
+						<pre style="<?php echo $css_data; ?>">Template</pre>
 					</div>
 
 					<div class="page-meta" style="width: 200px;">
@@ -157,7 +198,7 @@ function show() {
 					</div>
 
 					<div class="page-links-description page-meta page-meta-spacer">
-						Edit/View links will open in a new tab
+						Links open in a new tab
 					</div>
 
 				</li>
@@ -167,7 +208,7 @@ function show() {
 			</ul>
 		</div><!-- /.page-tree -->
 
-
+		<!-- // --- SIMPLE TABLE OUTPUT ------------------------------------ -->
 
 		<div id="simpleTable" class="pagetree-output" style="display: none;">
 
@@ -180,7 +221,9 @@ function show() {
 				<tr>
 					<th class="cell-table-layout">ID</th>
 					<th class="cell-table-layout">Modified</th>
+					<th class="cell-table-layout">Status</th>
 					<th class="cell-table-layout">Slug</th>
+					<th class="cell-table-layout">Template</th>
 					<th class="cell-table-layout">Title</th>
 					<th class="cell-table-layout">URL</th>
 				</tr>
@@ -191,7 +234,7 @@ function show() {
 
 		</div>
 
-
+		<!-- // --- TSV OUTPUT --------------------------------------------- -->
 
 		<div id="tsv" class="pagetree-output" style="display: none;">
 
@@ -199,12 +242,25 @@ function show() {
 
 			<input type="button" value="<?php echo $txtCopyButton; ?>" onclick="selectElementContents( document.getElementById('ptIDURL') );">
 
-			<pre id="ptIDURL" class="code"><?php echo page_tree_output_idurl(); ?></pre>
+			<pre id="ptIDURL" class="code"><?php
+
+				echo "ID";
+				echo "\t";
+				echo "Status";
+				echo "\t";
+				echo "Template";
+				echo "\t";
+				echo "Title";
+				echo "\t";
+				echo "URL";
+				echo "\t";
+				echo "\n";
+
+				echo page_tree_output_idurl(); ?></pre>
 
 		</div>
 
-
-
+		<!-- // --- LPR OUTPUT --------------------------------------------- -->
 
 		<div id="linePrinter" class="pagetree-output" style="display: none;">
 
@@ -230,7 +286,11 @@ function page_tree_output() {
 	$args = array(
 		'title_li' => '',
 		'show_date' => 'modified',
-		'walker' => new Page_Walker()
+		'walker' => new Page_Walker(),
+		'post_status' => array(
+			'publish',
+			'draft',
+		),
 	);
 
 	echo wp_list_pages( $args );
@@ -244,7 +304,11 @@ function page_tree_output_table() {
 	$args = array(
 		'title_li' => '',
 		'show_date' => 'modified',
-		'walker' => new Page_Walker_Table()
+		'walker' => new Page_Walker_Table(),
+		'post_status' => array(
+			'publish',
+			'draft',
+		),
 	);
 
 	echo wp_list_pages( $args );
@@ -258,7 +322,11 @@ function page_tree_output_lpr() {
 	$args = array(
 		'title_li' => '',
 		'show_date' => 'modified',
-		'walker' => new Page_Walker_LPR()
+		'walker' => new Page_Walker_LPR(),
+		'post_status' => array(
+			'publish',
+			'draft',
+		),
 	);
 
 	echo wp_list_pages( $args );
@@ -272,7 +340,11 @@ function page_tree_output_idurl() {
 	$args = array(
 		'title_li' => '',
 		'show_date' => 'modified',
-		'walker' => new Page_Walker_TSV()
+		'walker' => new Page_Walker_TSV(),
+		'post_status' => array(
+			'publish',
+			'draft',
+		),
 	);
 
 	echo wp_list_pages( $args );
@@ -300,6 +372,23 @@ class Page_Walker extends \Walker_page {
 
 		$dateModified = $page->post_modified;
 		$dateModified = date( "Y-m-d", strtotime($dateModified) );
+
+		$page_status = NULL;
+		$page_status = $page->post_status;
+
+		switch ( $page->post_status ) {
+			case 'draft';
+				$page_status = 'D';
+			break;
+
+			case 'publish';
+				$page_status = 'P';
+			break;
+
+			case 'scheduled';
+				$page_status = 'S';
+			break;
+		}
 
 		// Caution! This same item is declared twice in the file.
 		// If you change one, be sure to change the other.
@@ -336,7 +425,9 @@ class Page_Walker extends \Walker_page {
 				<a href="javascript:void(0);" onclick="toggleParent(<?php echo $page->ID; ?>)" style="text-decoration: none; color: inherit;">
 			<?php } ?>
 
-			<?php echo $page->post_title; ?>
+			<?php $page_title = page_tree_return_text( $page->post_title ); ?>
+
+			<?php echo $page_title; ?>
 
 			<?php if ( $itemIsParent ) { ?>
 				</a>
@@ -347,12 +438,22 @@ class Page_Walker extends \Walker_page {
 
 		<?php // Write items in backwards order because of float right ?>
 
+		<div class="page-meta" style="width: 30px;">
+			<pre style="<?php echo $css_data; ?>"><?php echo $page_status; ?></pre>
+		</div>
+
 		<div class="page-meta" style="width: 90px;">
 			<pre style="<?php echo $css_data; ?>"><?php echo $dateModified; ?></pre>
 		</div>
 
 		<div class="page-meta" style="width: 200px;">
-			<pre style="<?php echo $css_data; ?>"><?php echo $page->post_name; ?></pre>
+			<pre style="<?php echo $css_data; ?>"><?php echo return_page_template( $page->ID ); ?></pre>
+		</div>
+
+		<?php $page_slug = page_tree_return_text( $page->post_name ); ?>
+
+		<div class="page-meta" style="width: 200px;">
+			<pre style="<?php echo $css_data; ?>"><?php echo $page_slug; ?></pre>
 		</div>
 
 		<div class="page-meta" style="width: 60px;">
@@ -416,7 +517,9 @@ class Page_Walker_Table extends Walker_page {
 
 			<td style="<?php echo $style; ?>"><?php echo $page->ID; ?></td>
 			<td style="<?php echo $style; ?>"><?php echo $dateModified; ?></td>
+			<td style="<?php echo $style; ?>"><?php echo $page->post_status; ?></td>
 			<td style="<?php echo $style; ?>"><?php echo $page->post_name; ?></td>
+			<td style="<?php echo $style; ?>"><?php echo return_page_template( $page->ID ); ?></td>
 
 			<td style="<?php echo $style; ?>">
 
@@ -455,6 +558,12 @@ class Page_Walker_LPR extends Walker_page {
 		$dateModified = $page->post_modified;
 		$dateModified = date( "Y-m-d", strtotime($dateModified) );
 
+		$show_post_status = FALSE;
+
+		if ( 'publish' != $page->post_status ) {
+			$show_post_status = TRUE;
+		}
+
 		ob_start();
 
 		echo str_pad( $page->ID, 10, " ", STR_PAD_LEFT );
@@ -470,7 +579,11 @@ class Page_Walker_LPR extends Walker_page {
 
 		}
 
-		echo $page->post_name;
+		echo page_tree_return_text( $page->post_name );
+
+		if ( $show_post_status ) {
+			echo " (" . $page->post_status . ")";
+		}
 
 		echo "\n";
 
@@ -504,7 +617,11 @@ class Page_Walker_TSV extends Walker_page {
 
 		echo $page->ID;
 		echo "\t";
-		echo get_the_title( $page->ID );
+		echo $page->post_status;
+		echo "\t";
+		echo return_page_template( $page->ID );
+		echo "\t";
+		echo page_tree_return_text( get_the_title( $page->ID ) );
 		echo "\t";
 		echo get_page_link( $page->ID );
 		echo "\n";
@@ -515,4 +632,16 @@ class Page_Walker_TSV extends Walker_page {
 	public function end_el( &$out, $page, $depth = 0, $args = array() ) {
 		$out .= "";
 	}
+}
+
+// -----------------------------------------------------------------------------
+
+function page_tree_return_text( $v ) {
+
+	if ( empty( $v ) ) {
+		return "-";
+	} else {
+		return $v;
+	}
+
 }
