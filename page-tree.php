@@ -2,7 +2,7 @@
 /*
 Plugin Name: E20 Page Tree
 Description: Advanced page tree view for easy site browsing and data exports.
-Version: 1.1.7
+Version: 1.1.8
 Author: Gaelan Lloyd
 Author URI: http://www.gaelanlloyd.com
 */
@@ -290,6 +290,7 @@ function page_tree_output() {
 		'post_status' => array(
 			'publish',
 			'draft',
+			'future',
 		),
 	);
 
@@ -308,6 +309,7 @@ function page_tree_output_table() {
 		'post_status' => array(
 			'publish',
 			'draft',
+			'future',
 		),
 	);
 
@@ -326,6 +328,7 @@ function page_tree_output_lpr() {
 		'post_status' => array(
 			'publish',
 			'draft',
+			'future',
 		),
 	);
 
@@ -344,6 +347,7 @@ function page_tree_output_idurl() {
 		'post_status' => array(
 			'publish',
 			'draft',
+			'future',
 		),
 	);
 
@@ -385,8 +389,8 @@ class Page_Walker extends \Walker_page {
 				$page_status = 'P';
 			break;
 
-			case 'scheduled';
-				$page_status = 'S';
+			case 'future';
+				$page_status = 'F';
 			break;
 		}
 
