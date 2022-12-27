@@ -70,6 +70,9 @@ function show() {
 	.clearfix { clear: both; }
 	.public { background-color: #C5E0B3; }
 	pre.code { border: 1px solid #D0D0D0; background-color: #F0F0F0; padding: 0.25em; }
+	.draft { background-color: #FFCC99; }
+	.future { background-color: #CC99FF; }
+	.centered { text-align: center; }
 </style>
 
 <script>
@@ -177,7 +180,7 @@ function show() {
 
 					<?php // Items in backwards order because of float right ?>
 
-					<div class="page-meta" style="width: 30px;">
+					<div class="page-meta centered" style="width: 30px;">
 						<pre style="<?php echo $css_data; ?>">S</pre>
 					</div>
 
@@ -380,9 +383,12 @@ class Page_Walker extends \Walker_page {
 		$page_status = NULL;
 		$page_status = $page->post_status;
 
+		$td_class = NULL;
+
 		switch ( $page->post_status ) {
 			case 'draft';
 				$page_status = 'D';
+				$td_class = 'draft';
 			break;
 
 			case 'publish';
@@ -391,6 +397,7 @@ class Page_Walker extends \Walker_page {
 
 			case 'future';
 				$page_status = 'F';
+				$td_class = 'future';
 			break;
 		}
 
@@ -442,7 +449,7 @@ class Page_Walker extends \Walker_page {
 
 		<?php // Write items in backwards order because of float right ?>
 
-		<div class="page-meta" style="width: 30px;">
+		<div class="page-meta centered <?php echo $td_class; ?>" style="width: 30px;">
 			<pre style="<?php echo $css_data; ?>"><?php echo $page_status; ?></pre>
 		</div>
 
