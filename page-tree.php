@@ -57,16 +57,16 @@ function show() {
 	.item-meta { line-height: 8px; border: 1px solid #D0D0D0; padding: 0.5em; background-color: #F0F0F0; }
 	.page-item { display: inline-block; }
 	.page-item-header { background-color: rgba(34,113,177,0.3); line-height: 2em; border-top: none !important; }
-	.page-meta-header,
-	.page-meta-input-header { font-weight: bold; }
 	.page-meta { float: right; margin-right: 0.5em; display: inline; }
 	.page-meta-spacer { margin-right: 1em; }
 	.page-meta-input,
 	.page-meta-input[readonly] { font-family: monospace; padding: 2px; margin: 0; border: 1px solid #E0E0E0; border-style: solid; }
 	.page-meta-header.page-title { padding-left: 1em; }
 	.page-links-description { }
-	.page-has-children { font-weight: bold; cursor: pointer; cursor: hand; }
+	.page-has-no-children { margin-left: 24px; }
+	.page-has-children { cursor: pointer; }
 	.page-control { display: inline-block; }
+	.controls { display: flex; justify-content: space-between; margin: 1rem 0; }
 	.clearfix { clear: both; }
 	.public { background-color: #C5E0B3; }
 	pre.code { border: 1px solid #D0D0D0; background-color: #F0F0F0; padding: 0.25em; }
@@ -166,6 +166,17 @@ function show() {
 		<!-- // --- PAGE TREE OUTPUT --------------------------------------- -->
 
 		<div id="pageTree" class="pagetree-output page-tree">
+
+			<div class="controls">
+				<div class="left">
+					<button onclick="expandAll()">Expand all</button>
+					<button onclick="collapseAll()">Collapse all</button>
+				</div>
+				<div class="right">
+					<div><!--<span class="dashicons dashicons-info"></span>-->Edit and View links open in a new tab</div>
+				</div>
+			</div>
+
 			<ul>
 
 				<?php // Table key ?>
@@ -173,36 +184,16 @@ function show() {
 				<li class="page-item-header">
 
 					<div class="page-item">
-						<div class="page-meta"><a href="javascript:void(0)" onclick="expandAll()">Expand all</a></div>
-						<div class="page-meta"><a href="javascript:void(0)" onclick="collapseAll()">Collapse all</a></div>
 						<div class="page-title page-meta page-meta-header">Page title</div>
 					</div>
 
 					<?php // Items in backwards order because of float right ?>
 
-					<div class="page-meta centered" style="width: 30px;">
-						<pre style="<?php echo $css_data; ?>">S</pre>
-					</div>
-
-					<div class="page-meta" style="width: 90px;">
-						<pre style="<?php echo $css_data; ?>">Modified</pre>
-					</div>
-
-					<div class="page-meta" style="width: 200px;">
-						<pre style="<?php echo $css_data; ?>">Template</pre>
-					</div>
-
-					<div class="page-meta" style="width: 200px;">
-						<pre style="<?php echo $css_data; ?>">Slug</pre>
-					</div>
-
-					<div class="page-meta" style="width: 60px;">
-						<pre style="<?php echo $css_data; ?>">ID</pre>
-					</div>
-
-					<div class="page-links-description page-meta page-meta-spacer">
-						Links open in a new tab
-					</div>
+					<div class="page-meta centered" style="width: 30px;">S</div>
+					<div class="page-meta" style="width: 90px;">Modified</div>
+					<div class="page-meta" style="width: 200px;">Template</div>
+					<div class="page-meta" style="width: 200px;">Slug</div>
+					<div class="page-meta" style="width: 60px;">ID</div>
 
 				</li>
 
@@ -416,7 +407,7 @@ class Page_Walker extends \Walker_page {
 		} else {
 
 			$liClass = '';
-			$titleClass = '';
+			$titleClass = 'page-has-no-children';
 			$itemIsParent = FALSE;
 
 		}
